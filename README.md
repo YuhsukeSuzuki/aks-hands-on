@@ -16,11 +16,13 @@ kubectl が AKS に接続できることを確認する。
 
 以下のような出力が得られれば正常。
 
-`Kubernetes master is running at https://myakscluster-dns-1283394f.hcp.japaneast.azmk8s.io:443`
-`healthmodel-replicaset-service is running at https://myakscluster-dns-1283394f.hcp.japaneast.azmk8s.io:443/api/v1/namespaces/kube-system/services/healthmodel-replicaset-service/proxy`
-`CoreDNS is running at https://myakscluster-dns-1283394f.hcp.japaneast.azmk8s.io:443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy`
-`kubernetes-dashboard is running at https://myakscluster-dns-1283394f.hcp.japaneast.azmk8s.io:443/api/v1/namespaces/kube-system/services/kubernetes-dashboard/proxy`
-`Metrics-server is running at https://myakscluster-dns-1283394f.hcp.japaneast.azmk8s.io:443/api/v1/namespaces/kube-system/services/https:metrics-server:/proxy`
+```
+Kubernetes master is running at https://myakscluster-dns-1283394f.hcp.japaneast.azmk8s.io:443
+healthmodel-replicaset-service is running at https://myakscluster-dns-1283394f.hcp.japaneast.azmk8s.io:443/api/v1/namespaces/kube-system/services/healthmodel-replicaset-service/proxy
+CoreDNS is running at https://myakscluster-dns-1283394f.hcp.japaneast.azmk8s.io:443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+kubernetes-dashboard is running at https://myakscluster-dns-1283394f.hcp.japaneast.azmk8s.io:443/api/v1/namespaces/kube-system/services/kubernetes-dashboard/proxy
+Metrics-server is running at https://myakscluster-dns-1283394f.hcp.japaneast.azmk8s.io:443/api/v1/namespaces/kube-system/services/https:metrics-server:/proxy
+```
 
 AKS クラスタ上のノードが正常であることを確認する。
 
@@ -28,13 +30,12 @@ AKS クラスタ上のノードが正常であることを確認する。
 
 以下のような出力が得られれば正常。
 
-`NAME                       STATUS   ROLES   AGE   VERSION`
-
-`aks-agentpool-19694923-0   Ready    agent   18d   v1.14.6`
-
-`aks-agentpool-19694923-1   Ready    agent   18d   v1.14.6`
-
-`aks-agentpool-19694923-3   Ready    agent   18d   v1.14.6`
+```
+NAME                       STATUS   ROLES   AGE   VERSION
+aks-agentpool-19694923-0   Ready    agent   18d   v1.14.6
+aks-agentpool-19694923-1   Ready    agent   18d   v1.14.6
+aks-agentpool-19694923-3   Ready    agent   18d   v1.14.6
+```
 
 ## Nginx コンテナの準備
 docker-hub から nginx のコンテナイメージを pull する。
@@ -181,7 +182,7 @@ ConfigMap を定義する前に、以下のコマンドで現在の Nginx ポッ
 
 次に、Nginx のデプロイメントに以下の内容を追記する。
 
-'''
+```
     spec:
       containers:
         ...（略）
@@ -198,7 +199,7 @@ ConfigMap を定義する前に、以下のコマンドで現在の Nginx ポッ
             - key: nginx.conf
               path: nginx.conf
 
-'''
+```
 
 ※ 追記済みのYAMLは nginx-deployment-proxy.yaml 
 
@@ -217,4 +218,36 @@ ConfigMap を定義する前に、以下のコマンドで現在の Nginx ポッ
 
 以上で、ブラウザから http://<External IP>/app/ へアクセスし、Hello Worldが表示されれば正常。（URL末尾の/は必須）
 
+## Pod のスケーリング
+デプロイ済みの Hello-world-express アプリをスケーリングする。以下のコマンドを実行する。
 
+`$kubectl scale --replicas=2 deployment/app`
+
+`kubectl get pods`を実行し、app の Pod が２つになっていることを確認する。
+
+
+
+## Pod への負荷分散の確認
+サービスは、Podに対する負荷分散の機能を有している。今回の環境でも、app のポッドが増加したことにより、負荷分散が行われている。
+ここでは、新たにターミナルを二つ立ち上げ、負荷分散が行われていることを確認する。
+
+立ち上げた2つのターミナルそれぞれで、以下のコマンドを実行する。
+
+`$kubectl logs <Pod名> -f`
+※ Pod 名は各々のターミナルで異なるものを使用する。
+
+ブラウザ、もしくは Curl を使用して、http://<External IP>/app/ へアクセスすると、どちらかのターミナルに以下のようなアクセスログが表示される。
+
+```
+Hello World listening on port 3000!
+::ffff:10.244.3.13 - - [08/Oct/2019:06:33:54 +0000] "GET / HTTP/1.0" 304 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36"
+```
+何度もアクセスを繰り返すことにより、アクセスログがそれぞれのターミナルに記録されることで、ロードバランシングが行われていることを確認する。
+
+## Node のスケール
+AKSを構成しているノードプールの数を、az aks コマンドで変更することができる。この作業の完了には数分を要する。
+以下のコマンドを実行する。
+
+`$az aks scale --resource-group <リソースグループ名> --name <AKSクラスタ名> --node-count <スケールさせたいノード数>`
+
+ノード数は増減させることが可能である。ただし、ノード数を減少させる場合はランダムで選択されたノード（通常は最も最近作成されたノード）上のPodが停止するため、レプリカ数が１の Pod が配置されていた場合には、サービス停止時間が発生してしまうことに注意する。
