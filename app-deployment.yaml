@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: app
-        image: yusuzuacr20190919.azurecr.io/node-hello-world-express 
+        image: yusuzuacr20190919.azurecr.io/node-hello-world-express:latest
         resources:
           limits:
             memory: "128Mi"

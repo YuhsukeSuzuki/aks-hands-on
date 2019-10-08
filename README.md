@@ -147,3 +147,74 @@ ACR レジストリにイメージをプッシュする。
 
 `kubectl describe pods <Pod名>`
 
+# hello-world-express のサービス定義
+Nginx から内部ネットワークで通信するために、hello-world-express に対してサービスの定義を行う。
+
+以下のコマンドを実行する。
+
+`$kubectl apply -f ./app-service.yaml`
+
+以下のコマンドで、サービスが作成されることを確認する。
+
+`$kubectl get services`
+
+ClusterIP タイプのサービスは、瞬時に作成される。
+
+# Nginx の設定（ConfigMapの作成とDeploymentの変更）
+Nginx から hello-world-express にプロキシ設定を行うために、Kubernetes の ConfigMap を使用して、起動する Nginx の Pod に設定を行う。
+コンテナ内の /etc/nginx を ConfigMap で定義した内容で入れ替える。
+
+ConfigMap を定義する前に、以下のコマンドで現在の Nginx ポッド内のディレクトリ構造を確認する。
+
+`$kubectl exec <NginxのPod名> -it /bin/bash`
+`#ls /etc/nginx`
+
+以下のコマンドを実行する。
+
+`$kubectl apply -f ./nginx-configmap.yaml`
+
+以下のコマンドで、ConfigMap が定義されたことを確認する。
+
+`$kubectl get comfigmaps`
+
+コンフィグマップは Kubernetes クラスタ上に存在する KVS（etcd）に格納されている。
+
+次に、Nginx のデプロイメントに以下の内容を追記する。
+
+'''
+    spec:
+      containers:
+        ...（略）
+        # ここから下を追記
+        volumeMounts:
+        - mountPath: /etc/nginx
+          readOnly: true
+          name: nginx-conf
+      volumes:
+      - name: nginx-conf
+        configMap:
+          name: nginx-configmap
+          items:
+            - key: nginx.conf
+              path: nginx.conf
+
+'''
+
+※ 追記済みのYAMLは nginx-deployment-proxy.yaml 
+
+以下のコマンドで、Nginx のデプロイメントを更新する。
+
+`$kubectl apply -f nginx-deployment.yaml`
+
+以下のコマンドで、Nginx の Pod が更新されることを確認する。（Pod名が変更になっていれば更新完了）
+
+`$kubectl get pods`
+
+以下のコマンドで、Nginx の Pod 内のコンテナに接続し、/etc/nginx/nginx.conf の内容が ConfigMap のものと同一であることを確認する。
+
+`$kubectl exec <NginxのPod名> -it /bin/bash`
+`#cat /etc/nginx/nginx.conf`
+
+以上で、ブラウザから http://<External IP>/app/ へアクセスし、Hello Worldが表示されれば正常。（URL末尾の/は必須）
+
+
