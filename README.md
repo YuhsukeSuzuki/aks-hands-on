@@ -66,7 +66,10 @@ ACR レジストリにイメージをプッシュする。
 ブラウザから Azure Portal にログインして、ACR 上にリポジトリが作成されていることを確認する。
 
 ## Nginx のポッドを起動する。
-ハンズオンキットのディレクトリに移動し、以下のコマンドを実行する。
+ハンズオンキットのディレクトリに移動し、nginx-deployment.yaml を編集する
+- 16 行目の image を、先ほど ACR に push したイメージのイメージ名に変更する。
+
+以下のコマンドを実行する。
 
 `$kubectl apply -f ./nginx-deployment.yaml`
 
@@ -82,7 +85,7 @@ Pod に bash で接続する。
 
 `kubectl exec <Pod名> -it /bin/bash`
 
-この状態では、まだ Nginx へのサービスエンドポイントが作成されていないため、Nginx にHTTPアクセスすることができないため、次項でサービスを定義して Nginx を起動する。
+この状態では、まだ Nginx に外部から接続可能なサービスエンドポイントが作成されていないため、Nginx にHTTPアクセスすることができないため、次項でサービスを定義して Nginx を起動する。
 
 ## Nginx 用のサービスを定義する。
 
@@ -97,9 +100,50 @@ Pod に bash で接続する。
 サービスが作成され、External IP がアサインされるまで数分を要する。
 External IP が付与されたら、ローカルPCのブラウザを使用して http://<External IP>/ へアクセスし、Nginx のページが表示されることを確認する。
 
+# hello-world-express の準備
+
+docker-hub から yuhsuke/hello-world-express のコンテナイメージを pull する。
+
+`docker pull yuhsuke/hello-world-express`
+
+pull したイメージをタグ付けする。
+
+`$docker tag nginx <ACRレジストリ名>.azurecr.io/<リポジトリ名（任意）/hello-world-express`
+
+例:`$docker tag nginx myacr.azurecr.io/myrepogitory/hello-world-express`
+
+イメージのタグ付けの結果を確認する。
+
+`$docker image ls`
+
+yuhsuke/hello-world-express と同じハッシュ値でタグ付けしたイメージが存在しているのを確認する。
 
 
 
+ACR レジストリにログインする。
 
+`$az acr login -name <ACRレジストリ名>`
 
+ACR レジストリにイメージをプッシュする。
+
+`$docker push <ACRレジストリ名>.azurecr.io/<リポジトリ名（任意）/hellow-world-express`
+
+ブラウザから Azure Portal にログインして、ACR 上にリポジトリが作成されていることを確認する。
+
+# hello-world-express のポッドを起動する。
+
+ハンズオンキットのディレクトリに移動し、app-deployment.yaml を編集する
+- 16 行目の image を、先ほど ACR に push したイメージのイメージ名に変更する。
+
+以下のコマンドを実行する。
+
+`$kubectl apply -f ./app-deployment.yaml`
+
+以下のコマンドで、Pod が起動したことを確認する。
+
+`kubectl get pods`
+
+表示された app-xxxx の Pod 名をコピーして、以下のコマンドで詳細を確認する。
+
+`kubectl describe pods <Pod名>`
 
