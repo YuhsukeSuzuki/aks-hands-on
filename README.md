@@ -190,7 +190,7 @@ ConfigMap を定義する前に、以下のコマンドで現在の Nginx ポッ
 
 以下のコマンドで、ConfigMap が定義されたことを確認する。
 
-`$kubectl get comfigmaps`
+`$kubectl get cofigmaps`
 
 コンフィグマップは Kubernetes クラスタ上に存在する KVS（etcd）に格納されている。
 
