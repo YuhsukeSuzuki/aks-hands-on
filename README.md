@@ -123,9 +123,9 @@ docker-hub から yuhsuke/hello-world-express のコンテナイメージを pul
 
 pull したイメージをタグ付けする。
 
-`$docker tag nginx <ACRレジストリ名>.azurecr.io/<リポジトリ名（任意）/hello-world-express`
+`$docker tag yuhsuke/hello-world-express <ACRレジストリ名>.azurecr.io/<リポジトリ名（任意）/hello-world-express`
 
-例:`$docker tag nginx myacr.azurecr.io/myrepogitory/hello-world-express`
+例:`$docker tag yuhsuke/hello-world-express myacr.azurecr.io/myrepogitory/hello-world-express`
 
 イメージのタグ付けの結果を確認する。
 
