@@ -311,7 +311,7 @@ Create Index の1ページ目で、Index Pattern  に `logstash-*` と入力し�
 ## Azure Monitor for Containers
 Azure Monitor による監視を有効化する。
 
-![Azure Portal画面](https://raw.githubusercontent.com/wiki/YuhsukeSuzuki/aks-hands-on/images/amfc.png)
+![Azure Portal画面](https://raw.githubusercontent.com/wiki/YuhsukeSuzuki/aks-hands-on/images/amfc.PNG)
 
 
 Azure Portal から、対象のAKSクラスタのブレードを表示させ、左側のメニューで"監視"の"ログ"を選択する。
