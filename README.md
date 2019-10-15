@@ -1,5 +1,19 @@
 # Azure Kubernetes Service ハンズオン
 
+## 概要
+本ハンズオンでは、下図の構成をAKS環境上に構築することを目的とする。
+![ハンズオン構成図](https://raw.githubusercontent.com/wiki/YuhsukeSuzuki/aks-hands-on/images/overview.png)
+
+本ハンズオンでは、以下の項目を取り扱う。
+- Azure Conainer Registry へのイメージの Push と Azure Kubernetes Service との連携
+- Azure Kubernetes Service への Pod のデプロイ
+- Azure Kubernetes Service へのサービスの定義
+- 外部アクセス可能なサービスの定義と Azure Load Balancer
+- Kubernetes クラスタ内での Pod 間の通信
+- ConfigMap を利用したサーバ設定ファイルの注入
+- Pod のスケーリング
+- ノードのスケーリング
+
 ## 事前準備
 - AKS クラスターの作成
 - ACR レジストリの作成
@@ -109,9 +123,9 @@ docker-hub から yuhsuke/hello-world-express のコンテナイメージを pul
 
 pull したイメージをタグ付けする。
 
-`$docker tag nginx <ACRレジストリ名>.azurecr.io/<リポジトリ名（任意）/hello-world-express`
+`$docker tag yuhsuke/hello-world-express <ACRレジストリ名>.azurecr.io/<リポジトリ名（任意）/hello-world-express`
 
-例:`$docker tag nginx myacr.azurecr.io/myrepogitory/hello-world-express`
+例:`$docker tag yuhsuke/hello-world-express myacr.azurecr.io/myrepogitory/hello-world-express`
 
 イメージのタグ付けの結果を確認する。
 
@@ -176,7 +190,7 @@ ConfigMap を定義する前に、以下のコマンドで現在の Nginx ポッ
 
 以下のコマンドで、ConfigMap が定義されたことを確認する。
 
-`$kubectl get comfigmaps`
+`$kubectl get cofigmaps`
 
 コンフィグマップは Kubernetes クラスタ上に存在する KVS（etcd）に格納されている。
 
@@ -223,8 +237,9 @@ ConfigMap を定義する前に、以下のコマンドで現在の Nginx ポッ
 
 `$kubectl scale --replicas=2 deployment/app`
 
-`kubectl get pods`を実行し、app の Pod が２つになっていることを確認する。
+`$kubectl get pods`を実行し、app の Pod が２つになっていることを確認する。
 
+（スケーリング前に別ターミナルで、`$kubectl get pods -w` を実行することで、Pod が新しく作成され、起動するまでを確認することができる）
 
 
 ## Pod への負荷分散の確認
@@ -251,3 +266,7 @@ AKSを構成しているノードプールの数を、az aks コマンドで変�
 `$az aks scale --resource-group <リソースグループ名> --name <AKSクラスタ名> --node-count <スケールさせたいノード数>`
 
 ノード数は増減させることが可能である。ただし、ノード数を減少させる場合はランダムで選択されたノード（通常は最も最近作成されたノード）上のPodが停止するため、レプリカ数が１の Pod が配置されていた場合には、サービス停止時間が発生してしまうことに注意する。
+
+なお、スケール時に以下のコマンド等で外部からの応答を確認する。
+
+`$while :; do curl http://<External IP>/app/ ; sleep 1; done` 
