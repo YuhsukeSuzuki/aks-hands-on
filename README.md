@@ -270,3 +270,39 @@ AKSを構成しているノードプールの数を、az aks コマンドで変�
 なお、スケール時に以下のコマンド等で外部からの応答を確認する。
 
 `$while :; do curl http://<External IP>/app/ ; sleep 1; done` 
+
+## Podのログの確認
+コンテナは揮発性があるため、標準ではログは永続化されず、標準出力へ標準エラー出力がリダイレクトされたものがログとして出力される。
+以下のコマンドを実施して、Podの標準出力を確認する。
+
+`$kubectl logs <Pod名>`
+
+例:`$kubectl logs nginx-c77fbcd56-67wx4 `
+
+## fluentd + elasticsearch + Kibana によるログ収集環境の構築
+[公式のアドオン](https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/fluentd-elasticsearch)を使用して、fluentd + elasticsearch + Kibana でログを収集するための環境を構築する。
+
+Kubernetesクラスタ上に、"monitoring"という名前で**namespace**を作成する。
+`$kubectl create namespace monitoring`
+
+ハンズオンキットのloggingディレクトリをすべてクラスタに適用する。
+`$kubectl apply -f logging/`
+
+"kibana-logging" サービスに External IP が割り当てられるまで待つ。
+Kibanaにアクセスする。
+`http://<External IP>:5601/`
+※ 必ず、chrome/fire fox で開くこと。
+
+Kibanaの画面が表示されたら、"my own ..." を選択後、Home 画面で "Manage and ..." -> "Index Patterns" -> "Create New Index" と選択。
+Create Index の1ページ目で、Index Pattern  に `logstash-*` と入力し、Next Step。
+2ページ目で、Time Filter Field を @timestamp を選択。
+
+以上で、左側メニューのDiscoverから、クラスタのノード、およびPodから収集してきたログを確認することができる。
+
+## Azure Monitor for Containers
+Azure Monitor による監視を有効化する。
+
+Azure Portal から、対象のAKSクラスタのブレードを表示させ、左側のメニューで"監視"の"ログ"を選択する。
+Log Analytics のワークスペースを選択し、"有効化" ボタンを押下する。
+
+Azure Monitor for Containers の機能が有効化され、Azure Portal 上でクラスタの状態を確認することができるようになる。
