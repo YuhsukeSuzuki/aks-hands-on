@@ -298,6 +298,8 @@ Kibanaにアクセスする。
 
 ※ 必ず、chrome/fire fox で開くこと。
 
+![Kibana画面](https://raw.githubusercontent.com/wiki/YuhsukeSuzuki/aks-hands-on/images/kibana.png)
+
 Kibanaの画面が表示されたら、"my own ..." を選択後、Home 画面で "Manage and ..." -> "Index Patterns" -> "Create New Index" と選択。
 
 Create Index の1ページ目で、Index Pattern  に `logstash-*` と入力し、Next Step。
