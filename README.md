@@ -283,26 +283,39 @@ AKSを構成しているノードプールの数を、az aks コマンドで変�
 [公式のアドオン](https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/fluentd-elasticsearch)を使用して、fluentd + elasticsearch + Kibana でログを収集するための環境を構築する。
 
 Kubernetesクラスタ上に、"monitoring"という名前で**namespace**を作成する。
+
 `$kubectl create namespace monitoring`
 
 ハンズオンキットのloggingディレクトリをすべてクラスタに適用する。
+
 `$kubectl apply -f logging/`
 
 "kibana-logging" サービスに External IP が割り当てられるまで待つ。
+
 Kibanaにアクセスする。
+
 `http://<External IP>:5601/`
+
 ※ 必ず、chrome/fire fox で開くこと。
 
 Kibanaの画面が表示されたら、"my own ..." を選択後、Home 画面で "Manage and ..." -> "Index Patterns" -> "Create New Index" と選択。
+
 Create Index の1ページ目で、Index Pattern  に `logstash-*` と入力し、Next Step。
+
 2ページ目で、Time Filter Field を @timestamp を選択。
 
+
 以上で、左側メニューのDiscoverから、クラスタのノード、およびPodから収集してきたログを確認することができる。
+
 
 ## Azure Monitor for Containers
 Azure Monitor による監視を有効化する。
 
+![Azure Portal画面](https://raw.githubusercontent.com/wiki/YuhsukeSuzuki/aks-hands-on/images/.png)
+
+
 Azure Portal から、対象のAKSクラスタのブレードを表示させ、左側のメニューで"監視"の"ログ"を選択する。
+
 Log Analytics のワークスペースを選択し、"有効化" ボタンを押下する。
 
 Azure Monitor for Containers の機能が有効化され、Azure Portal 上でクラスタの状態を確認することができるようになる。
