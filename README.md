@@ -332,13 +332,21 @@ Azure Monitor for Containers の機能が有効化され、Azure Portal 上で�
 ## helm を使用した Grafana の設定
 
 以下のコマンドを実行する。
+
 `$kubectl apply -f rbac/helm-tiller.yaml`
+
 `$sudo snap install helm --classic`
+
 `$helm init --service-account tiller --upgrade`
+
 `$helm helm repo add coreos https://s3-eu-west-1.amazonaws.com/coreos-charts/stable/`
+
 `$helm install coreos/prometheus-operator --name prometheus-operator --namespace monitoring`
+
 `$helm install coreos/kube-prometheus --name kube-prometheus --namespace monitoring`
 
+
 デフォルトでは外部からGrafanaにアクセスできないので、サービスを修正する。
+
 `$kubectl apply -f kube-prometheus-grafana.yaml`
 
