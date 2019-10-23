@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2019-10-23T02:33:52Z"
+  labels:
+    app: kube-prometheus-grafana
+    chart: grafana-0.0.37
+    heritage: Tiller
+    release: kube-prometheus
+  name: kube-prometheus-grafana
+  namespace: monitoring
+  resourceVersion: "4653954"
+  selfLink: /api/v1/namespaces/monitoring/services/kube-prometheus-grafana
+  uid: 8d348f27-f53d-11e9-8b41-bedd4bff2011
+spec:
+  clusterIP: 10.0.252.222
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 3000
+  selector:
+    app: kube-prometheus-grafana
+  sessionAffinity: None
+  type: LoadBalancer
+status:
+  loadBalancer: {}
