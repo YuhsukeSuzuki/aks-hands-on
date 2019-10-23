@@ -330,18 +330,31 @@ Azure Monitor for Containers の機能が有効化され、Azure Portal 上で�
 ※ Teraterm などでターミナル接続を行っている場合はSSHポート転送設定が必要
 
 ## helm を使用した Grafana の設定
+![参考URL](https://itnext.io/using-prometheus-in-azure-kubernetes-service-aks-ae22cada8dd9)
 
 以下のコマンドを実行する。
 
+tillerの追加
+
 `$kubectl apply -f rbac/helm-tiller.yaml`
+
+helmのインストール
 
 `$sudo snap install helm --classic`
 
+helmの初期化
+
 `$helm init --service-account tiller --upgrade`
+
+helm リポジトリの追加
 
 `$helm helm repo add coreos https://s3-eu-west-1.amazonaws.com/coreos-charts/stable/`
 
+prometheus-operatorのインストール
+
 `$helm install coreos/prometheus-operator --name prometheus-operator --namespace monitoring`
+
+kube-prometheusのインストール
 
 `$helm install coreos/kube-prometheus --name kube-prometheus --namespace monitoring`
 
