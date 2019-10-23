@@ -330,7 +330,7 @@ Azure Monitor for Containers の機能が有効化され、Azure Portal 上で�
 ※ Teraterm などでターミナル接続を行っている場合はSSHポート転送設定が必要
 
 ## helm を使用した Grafana の設定
-![参考URL](https://itnext.io/using-prometheus-in-azure-kubernetes-service-aks-ae22cada8dd9)
+[参考URL](https://itnext.io/using-prometheus-in-azure-kubernetes-service-aks-ae22cada8dd9)
 
 以下のコマンドを実行する。
 
