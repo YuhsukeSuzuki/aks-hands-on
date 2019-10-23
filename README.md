@@ -321,3 +321,24 @@ Azure Portal から、対象のAKSクラスタのブレードを表示させ、�
 Log Analytics のワークスペースを選択し、"有効化" ボタンを押下する。
 
 Azure Monitor for Containers の機能が有効化され、Azure Portal 上でクラスタの状態を確認することができるようになる。
+
+## Kubernetes Dashbord
+以下のコマンドでKubernetes Dashbordへ接続するローカル・プロキシが作成される。
+
+`$az aks browse --resource-group <リソースグループ名> --name <AKSクラスタ名>`
+
+※ Teraterm などでターミナル接続を行っている場合はSSHポート転送設定が必要
+
+## helm を使用した Grafana の設定
+
+以下のコマンドを実行する。
+`$kubectl apply -f rbac/helm-tiller.yaml`
+`$sudo snap install helm --classic`
+`$helm init --service-account tiller --upgrade`
+`$helm helm repo add coreos https://s3-eu-west-1.amazonaws.com/coreos-charts/stable/`
+`$helm install coreos/prometheus-operator --name prometheus-operator --namespace monitoring`
+`$helm install coreos/kube-prometheus --name kube-prometheus --namespace monitoring`
+
+デフォルトでは外部からGrafanaにアクセスできないので、サービスを修正する。
+`$kubectl apply -f kube-prometheus-grafana.yaml`
+
