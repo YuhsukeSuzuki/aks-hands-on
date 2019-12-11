@@ -270,3 +270,5 @@ Podの一覧を取得してみる。
 ```
   Error from server (Forbidden): pods is forbidden: User "system:serviceaccount:front-end:front-end-user" cannot list resource "pods" in API group "" in the namespace "back-end"
 ```
+
+これにより、それぞれのnamespaceにroleを作成し、rolebindingによってサービスアカウントと紐づけることで、namespaceへのアクセス操作を制御することが確認できた。
