@@ -1,0 +1,10 @@
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: security-level-policy-l2
+  namespace: back-end
+spec:
+  podSelector:
+    matchLabels:
+      security-level: L2
+  ingress: []

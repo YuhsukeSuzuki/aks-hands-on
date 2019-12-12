@@ -1,0 +1,30 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: front-end-user
+  namespace: front-end
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: front-end
+  name: front-end-role
+rules:
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: front-end-role-binding
+  namespace: front-end
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: front-end-role
+subjects:
+- kind: ServiceAccount
+  name: front-end-user
+  namespace: front-end
