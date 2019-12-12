@@ -297,7 +297,27 @@ Podの一覧を取得してみる。
 Podのシェルが起動したら、以下のコマンドで確認を行う。
 
 ```
-  #wget -qO- --timeout=2 http://back-end-nginx
+  #wget -qO- --timeout=2 http://back-end-nginx.back-end
 ```
 
 通信が拒否されるため、Podにアクセスすることができない。
+
+
+次に、先ほどのNetworkPolicyを変更して、access-privilege=allのラベルが付与されたnamespace: front-endにあるPodからのみ、アクセスを受け付けるようにする。
+
+以下のコマンドを実行する。
+
+```
+  $kubectl apply -f security/network-policy01.yaml
+```
+
+先ほどと同様にPodを起動して確認を行うと、通信できない状態である。
+
+そのため、起動するPodにaccess-privilege=allを付与して起動する。
+
+```
+  $kubectl run --rm -it --image=alpine client-pod --namespace front-end --generator=run-pod/v1 --labels access-privilege=all
+```
+
+再度確認を行うと、通信ができることが確認できる。
+
