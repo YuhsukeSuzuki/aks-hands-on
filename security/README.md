@@ -272,3 +272,32 @@ Podの一覧を取得してみる。
 ```
 
 これにより、それぞれのnamespaceにroleを作成し、rolebindingによってサービスアカウントと紐づけることで、namespaceへのアクセス操作を制御することが確認できた。
+
+## NetworkPolicyの適用
+### 前提条件
+- クラスタ構築時に```--network-policy```オプションを付与してクラスタを作成している。
+
+### NetworkPolicyの作成
+今回は、namespace: back-end にデプロイされたセキュリティレベルの高いPodに対してnamespace: front-end にデプロイされた特定のPodからのみ通信を受け付ける、という形でNetworkPolicyを作成する。
+
+初めに、以下のコマンドを実行する。
+
+```
+  $kubectl apply -f security/network-policy00.yaml
+```
+
+このポリシーを適用すると、特定のPodの受信トラフィックをすべて制限する。
+
+以下のコマンドを実行して、namespace: front-endにPodを作成し、back-endへのPodにアクセスできないことを確認する。
+
+```
+  $kubectl run --rm -it --image=alpine client-pod --namespace front-end --generator=run-pod/v1
+```
+
+Podのシェルが起動したら、以下のコマンドで確認を行う。
+
+```
+  #wget -qO- --timeout=2 http://back-end-nginx
+```
+
+通信が拒否されるため、Podにアクセスすることができない。
